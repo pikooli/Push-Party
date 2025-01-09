@@ -33,8 +33,8 @@ export default function Home() {
       mediapipeRef.current?.onMessage(setLandmarks);
       console.log('videoRef.current?.videoWidth', videoRef.current?.videoWidth);
       helperRef.current?.resizeCanvas(
-        videoRef.current?.videoWidth || 0,
-        videoRef.current?.videoHeight || 0
+        videoRef.current?.offsetWidth || 0,
+        videoRef.current?.offsetHeight || 0
       );
     });
   }, []);
