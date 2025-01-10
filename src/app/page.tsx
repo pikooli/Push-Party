@@ -43,7 +43,7 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (landmarks?.landmarks.length) {
+    if (landmarks?.landmarks?.length) {
       const position = caculePosition(landmarks);
       setPosition(position);
     }
@@ -51,7 +51,7 @@ export default function Home() {
 
   // const { position } = useHelper();
 
-  const getUserMedia = useCallback(() => {
+  useEffect(() => {
     mediapipeRef.current?.initUserMedia(() => {
       mediapipeRef.current?.onMessage(setLandmarks);
       console.log('videoRef.current?.videoWidth', videoRef.current?.videoWidth);
@@ -64,23 +64,15 @@ export default function Home() {
 
   return (
     <div className="h-screen w-screen">
-      <div className="hidden h-screen w-screen flex-col items-center justify-center">
-        <div className="relative">
-          <VideoMediapipe mediapipeRef={mediapipeRef} videoRef={videoRef} />
-          <HelperComponent
-            helperRef={helperRef}
-            landmarks={landmarks}
-            showHelper={true}
-          />
-        </div>
+      <div className="absolute left-0 top-0 h-screen -scale-x-100 transform">
+        <VideoMediapipe mediapipeRef={mediapipeRef} videoRef={videoRef} />
+        <HelperComponent
+          helperRef={helperRef}
+          landmarks={landmarks}
+          showHelper={true}
+        />
       </div>
-      <button
-        onClick={getUserMedia}
-        className="absolute left-1/2 z-50 bg-blue-500 text-white"
-      >
-        Get User Media
-      </button>
-      <View className="h-full w-full">
+      <View className="absolute left-0 top-0 h-full w-full">
         <Suspense fallback={null}>
           <Common orbit={false} videoRef={videoRef} />
           <Cone position={position} scale={1} />

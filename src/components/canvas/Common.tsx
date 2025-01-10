@@ -17,11 +17,11 @@ export const Common = ({
 
   useEffect(() => {
     if (videoRef.current) {
-      const videoTexture = new THREE.VideoTexture(videoRef.current);
-      videoTexture.colorSpace = THREE.SRGBColorSpace;
-      videoTexture.wrapS = THREE.RepeatWrapping;
-      videoTexture.repeat.x = -1;
-      scene.background = videoTexture;
+      // const videoTexture = new THREE.VideoTexture(videoRef.current);
+      // videoTexture.colorSpace = THREE.SRGBColorSpace;
+      // videoTexture.wrapS = THREE.RepeatWrapping;
+      // videoTexture.repeat.x = -1;
+      // scene.background = videoTexture;
     }
   }, [scene, videoRef]);
 
