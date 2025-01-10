@@ -31,7 +31,7 @@ export const HelperComponent = ({
 
   return (
     <canvas
-      className="absolute left-0 top-0 z-10 border border-blue-500"
+      className="absolute left-0 top-0 z-50 border border-blue-500"
       ref={canvasHelperRef}
     />
   );

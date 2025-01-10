@@ -6,7 +6,7 @@ const displayPosition = (position: THREE.Vector3) => {
   return `x: ${position.x.toFixed(2)}, y: ${position.y.toFixed(2)}, z: ${position.z.toFixed(2)}`;
 };
 
-export function Box(props: JSX.IntrinsicElements['mesh']) {
+export function Cone(props: JSX.IntrinsicElements['mesh']) {
   return (
     <mesh {...props}>
       <Text
@@ -17,7 +17,7 @@ export function Box(props: JSX.IntrinsicElements['mesh']) {
       >
         {displayPosition(props.position)}
       </Text>
-      <boxGeometry />
+      <coneGeometry />
       <meshStandardMaterial color="red" emissive="red" />
     </mesh>
   );
