@@ -1,23 +1,20 @@
-import {
-  HandLandmarkerResult,
-  FaceLandmarkerResult,
-} from '@mediapipe/tasks-vision';
-import { Z_POSITION, ZOOM } from '@/app/constants/constants';
+import { HandLandmarkerResult } from '@mediapipe/tasks-vision';
 import * as THREE from 'three';
 
-export const caculePosition = (landmarks: HandLandmarkerResult) => {
-  return new THREE.Vector3(0, 0, 0);
+export const caculePosition = (
+  landmarks: HandLandmarkerResult,
+  camera: THREE.Camera
+) => {
+  // Calculate clip space coordinates
+  const normalizedX = landmarks.landmarks[0][0].x;
+  const normalizedY = landmarks.landmarks[0][0].y;
 
-  // const handLandmark = landmarks.landmarks[0][0]; // Replace index with desired landmark
-  // if (!handLandmark) return new THREE.Vector3(0, 0, 0);
+  const clipX = (normalizedX - 0.5) * 2; // Map 0-1 to -1 to 1
+  const clipY = (normalizedY - 0.5) * -2; // Flip Y axis for Three.js
 
-  // const screenWidth = window.innerWidth; // Use screen width
-  // const screenHeight = window.innerHeight; // Use screen height
+  // Set up a vector in clip space with depth Z_POSITION
+  const vector = new THREE.Vector3(-clipX, clipY, 0.99); // Z = 0.5 means halfway between near and far plane
+  vector.unproject(camera);
 
-  // const aspectRatio = screenWidth / screenHeight;
-
-  // const ndcX = handLandmark.x * 2 - 1;
-  // const ndcY = -(handLandmark.y * 2 - 1); // Flip vertically
-  // console.log({ ndcX, ndcY });
-  // return new THREE.Vector3(-ndcX * 5, ndcY * 5, 0);
+  return vector;
 };
