@@ -8,9 +8,11 @@ import { View } from '@react-three/drei';
 import { HandLandmarkerResult } from '@mediapipe/tasks-vision';
 import { MediapipeModel } from '@/components/videoMediapipe/model/mediapipe';
 import { VideoMediapipe } from '@/components/videoMediapipe/VideoMediapipe';
-import { Cone } from '@/components/canvas/Cone';
 import { HelperModel } from '@/components/videoMediapipe/helper/model/helperModel';
 import { HelperComponent } from '@/components/videoMediapipe/helper/HelperComponent';
+import { ConeHelper } from '@/components/mesh/ConeHelper';
+import { BoxHelper } from '@/components/mesh/BoxHelper';
+import { DEBUG } from '@/constants';
 
 const Common = dynamic(
   () => import('@/components/canvas/Common').then((mod) => mod.Common),
@@ -55,16 +57,12 @@ export default function Home() {
   return (
     <div className="h-screen">
       <div className="absolute left-0 top-0 hidden">
-        <VideoMediapipe
-          mediapipeRef={mediapipeRef}
-          videoRef={videoRef}
-          isHidden={false}
-        />
+        <VideoMediapipe mediapipeRef={mediapipeRef} videoRef={videoRef} />
       </div>
       <HelperComponent
         helperRef={helperRef}
         landmarks={landmarks}
-        showHelper={true}
+        showHelper={DEBUG}
       />
       <button
         className="absolute left-1/2 top-0 z-50 bg-blue-500 p-4"
@@ -74,8 +72,16 @@ export default function Home() {
       </button>
       <View className="absolute left-0 top-0 h-screen w-screen">
         <Suspense fallback={null}>
-          <Common orbit={true} videoRef={videoRef} />
-          <Cone landmarks={landmarks} />
+          <Common videoRef={videoRef} />
+          <BoxHelper
+            landMark={
+              new THREE.Vector3(
+                landmarks?.landmarks?.[0]?.[0]?.x || 0,
+                landmarks?.landmarks?.[0]?.[0]?.y || 0,
+                landmarks?.landmarks?.[0]?.[0]?.z || 0
+              )
+            }
+          />
         </Suspense>
       </View>
     </div>

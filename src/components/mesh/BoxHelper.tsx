@@ -1,30 +1,31 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { useThree } from '@react-three/fiber';
-import { HandLandmarkerResult } from '@mediapipe/tasks-vision';
 import { caculePosition } from '@/utils/calculePosition';
 
 const displayPosition = (position: THREE.Vector3) => {
   return `x: ${position.x.toFixed(2)}, y: ${position.y.toFixed(2)}, z: ${position.z.toFixed(2)}`;
 };
 
-type ConeProps = JSX.IntrinsicElements['mesh'] & {
-  landmarks: HandLandmarkerResult | null;
+type BoxProps = JSX.IntrinsicElements['mesh'] & {
+  landMark: THREE.Vector3;
 };
 
-export function Cone(props: ConeProps) {
-  const { landmarks } = props;
+export function BoxHelper(props: BoxProps) {
+  const { landMark } = props;
   const { camera } = useThree();
   const [position, setPosition] = useState<THREE.Vector3>(new THREE.Vector3());
 
   useEffect(() => {
-    if (landmarks?.landmarks?.length) {
-      const position = caculePosition(landmarks, camera);
+    if (landMark) {
+      const position = caculePosition(landMark, camera);
       setPosition(position);
     }
-  }, [landmarks]);
+  }, [landMark]);
+
   return (
     <mesh {...props} position={position}>
       <Text
@@ -35,7 +36,7 @@ export function Cone(props: ConeProps) {
       >
         {displayPosition(position)}
       </Text>
-      <coneGeometry />
+      <boxGeometry />
       <meshStandardMaterial color="red" emissive="red" />
     </mesh>
   );
