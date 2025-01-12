@@ -15,11 +15,8 @@ export const HelperComponent = ({
 }: HelperComponentProps) => {
   const canvasHelperRef = useRef<HTMLCanvasElement>(null);
 
-  if (!showHelper) {
-    return null;
-  }
-
   useEffect(() => {
+    // @ts-expect-error canvasHelperRef is not null
     helperRef.current = new HelperModel(
       canvasHelperRef,
       canvasHelperRef?.current?.width || 0,
@@ -32,6 +29,10 @@ export const HelperComponent = ({
       helperRef.current?.drawElements(landmarks);
     }
   }, [landmarks, helperRef, showHelper]);
+
+  if (!showHelper) {
+    return null;
+  }
 
   return (
     <canvas

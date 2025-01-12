@@ -2,7 +2,7 @@
 
 import { Suspense, useRef, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useControls } from 'leva';
+// import { useControls } from 'leva';
 import * as THREE from 'three';
 import { View } from '@react-three/drei';
 import { HandLandmarkerResult } from '@mediapipe/tasks-vision';
@@ -10,7 +10,6 @@ import { MediapipeModel } from '@/components/videoMediapipe/model/mediapipe';
 import { VideoMediapipe } from '@/components/videoMediapipe/VideoMediapipe';
 import { HelperModel } from '@/components/videoMediapipe/helper/model/helperModel';
 import { HelperComponent } from '@/components/videoMediapipe/helper/HelperComponent';
-import { ConeHelper } from '@/components/mesh/ConeHelper';
 import { BoxHelper } from '@/components/mesh/BoxHelper';
 import { DEBUG } from '@/constants';
 
@@ -19,20 +18,20 @@ const Common = dynamic(
   { ssr: false }
 );
 
-const useHelper = () => {
-  const { position } = useControls({
-    position: {
-      value: { x: 0, y: 0, z: 0 },
-      step: 1,
-    },
-    screen: {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    },
-  });
+// const useHelper = () => {
+//   const { position } = useControls({
+//     position: {
+//       value: { x: 0, y: 0, z: 0 },
+//       step: 1,
+//     },
+//     screen: {
+//       width: window.innerWidth,
+//       height: window.innerHeight,
+//     },
+//   });
 
-  return { position: new THREE.Vector3(position.x, position.y, position.z) };
-};
+//   return { position: new THREE.Vector3(position.x, position.y, position.z) };
+// };
 
 export default function Home() {
   const mediapipeRef = useRef<MediapipeModel>(null);
@@ -43,7 +42,6 @@ export default function Home() {
   // const { position } = useHelper();
 
   const initMediapipe = useCallback(() => {
-    console.log('initMediapipe');
     mediapipeRef.current
       ?.initUserMedia(() => {
         mediapipeRef.current?.onMessage(setLandmarks);

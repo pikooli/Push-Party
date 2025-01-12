@@ -4,7 +4,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { Perf } from 'r3f-perf';
 import * as THREE from 'three';
-import { CAMERA_FOV, ZOOM, Z_POSITION } from '@/app/constants/constants';
+import { CAMERA_FOV, Z_POSITION } from '@/app/constants/constants';
 import { DEBUG } from '@/constants';
 
 export const Common = ({
@@ -12,7 +12,7 @@ export const Common = ({
 }: {
   videoRef: React.RefObject<HTMLVideoElement>;
 }) => {
-  const { scene, camera, size } = useThree();
+  const { scene, camera } = useThree();
 
   useEffect(() => {
     if (videoRef.current) {

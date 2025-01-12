@@ -15,6 +15,7 @@ export function Cone(props: JSX.IntrinsicElements['mesh']) {
         position={[0, 0, 0.6]}
         fontSize={0.1}
       >
+        {/* @ts-expect-error props.position is not null */}
         {displayPosition(props.position)}
       </Text>
       <coneGeometry />
