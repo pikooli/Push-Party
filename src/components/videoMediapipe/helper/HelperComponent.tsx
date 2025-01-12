@@ -15,6 +15,10 @@ export const HelperComponent = ({
 }: HelperComponentProps) => {
   const canvasHelperRef = useRef<HTMLCanvasElement>(null);
 
+  if (!showHelper) {
+    return null;
+  }
+
   useEffect(() => {
     helperRef.current = new HelperModel(
       canvasHelperRef,
@@ -31,7 +35,7 @@ export const HelperComponent = ({
 
   return (
     <canvas
-      className="absolute left-0 top-0 z-50 border border-blue-500"
+      className="pointer-events-none absolute left-0 top-0 z-50 h-screen w-screen -scale-x-100 transform"
       ref={canvasHelperRef}
     />
   );

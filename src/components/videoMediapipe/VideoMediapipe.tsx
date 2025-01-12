@@ -4,11 +4,13 @@ import { MediapipeModel } from '@/components/videoMediapipe/model/mediapipe';
 interface VideoMediapipeProps {
   mediapipeRef: React.RefObject<MediapipeModel | null>;
   videoRef: React.RefObject<HTMLVideoElement | null>;
+  isHidden: boolean;
 }
 
 export const VideoMediapipe = ({
   mediapipeRef,
   videoRef,
+  isHidden,
 }: VideoMediapipeProps) => {
   useEffect(() => {
     if (videoRef.current) {
@@ -27,7 +29,7 @@ export const VideoMediapipe = ({
       ref={videoRef}
       autoPlay
       playsInline
-      className={`h-screen`}
+      className={`h-screen ${isHidden ? 'hidden' : ''}`}
     />
   );
 };

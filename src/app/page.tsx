@@ -4,7 +4,7 @@ import { Suspense, useRef, useCallback, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useControls } from 'leva';
 import * as THREE from 'three';
-import { View } from '@react-three/drei';
+import { View, OrthographicCamera } from '@react-three/drei';
 import { HandLandmarkerResult } from '@mediapipe/tasks-vision';
 import { MediapipeModel } from '@/components/videoMediapipe/model/mediapipe';
 import { VideoMediapipe } from '@/components/videoMediapipe/VideoMediapipe';
@@ -38,43 +38,54 @@ export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const helperRef = useRef<HelperModel>(null);
   const [landmarks, setLandmarks] = useState<HandLandmarkerResult | null>(null);
-  const [position, setPosition] = useState<THREE.Vector3>(
-    new THREE.Vector3(0, 0, 0)
-  );
+  // const [position, setPosition] = useState<THREE.Vector3>(
+  //   new THREE.Vector3(0, 0, 0)
+  // );
 
-  useEffect(() => {
-    if (landmarks?.landmarks?.length) {
-      const position = caculePosition(landmarks);
-      setPosition(position);
-    }
-  }, [landmarks]);
+  // useEffect(() => {
+  //   if (landmarks?.landmarks?.length) {
+  //     const position = caculePosition(landmarks);
+  //     setPosition(position);
+  //   }
+  // }, [landmarks]);
 
-  // const { position } = useHelper();
+  const { position } = useHelper();
 
-  useEffect(() => {
-    mediapipeRef.current?.initUserMedia(() => {
-      mediapipeRef.current?.onMessage(setLandmarks);
-      console.log('videoRef.current?.videoWidth', videoRef.current?.videoWidth);
-      helperRef.current?.resizeCanvas(
-        videoRef.current?.offsetWidth || 0,
-        videoRef.current?.offsetHeight || 0
-      );
-    });
+  const initMediapipe = useCallback(() => {
+    console.log('initMediapipe');
+    mediapipeRef.current
+      ?.initUserMedia(() => {
+        mediapipeRef.current?.onMessage(setLandmarks);
+        helperRef.current?.resizeCanvas(window.innerWidth, window.innerHeight);
+      })
+      .catch((error) => {
+        console.error('Error initializing Mediapipe:', error);
+      });
   }, []);
 
   return (
-    <div className="h-screen w-screen">
-      <div className="absolute left-0 top-0 h-screen -scale-x-100 transform">
-        <VideoMediapipe mediapipeRef={mediapipeRef} videoRef={videoRef} />
-        <HelperComponent
-          helperRef={helperRef}
-          landmarks={landmarks}
-          showHelper={true}
+    <div className="h-screen">
+      <div className="absolute left-0 top-0 hidden">
+        <VideoMediapipe
+          mediapipeRef={mediapipeRef}
+          videoRef={videoRef}
+          isHidden={false}
         />
       </div>
-      <View className="absolute left-0 top-0 h-full w-full">
+      <HelperComponent
+        helperRef={helperRef}
+        landmarks={landmarks}
+        showHelper={true}
+      />
+      <button
+        className="absolute left-1/2 top-0 z-50 bg-blue-500 p-4"
+        onClick={initMediapipe}
+      >
+        Init Mediapipe
+      </button>
+      <View className="absolute left-0 top-0 h-screen w-screen">
         <Suspense fallback={null}>
-          <Common orbit={false} videoRef={videoRef} />
+          <Common orbit={true} videoRef={videoRef} />
           <Cone position={position} scale={1} />
         </Suspense>
       </View>
