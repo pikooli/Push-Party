@@ -15,10 +15,6 @@ export const VideoMediapipe = ({
       // @ts-expect-error videoRef can be null
       mediapipeRef.current = new MediapipeModel(videoRef);
     }
-
-    return () => {
-      mediapipeRef.current?.destroy();
-    };
   }, [mediapipeRef, videoRef]);
 
   return (

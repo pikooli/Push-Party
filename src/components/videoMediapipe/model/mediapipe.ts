@@ -1,47 +1,39 @@
-import { HandLandmarkerResult } from '@mediapipe/tasks-vision';
-import { MESSAGE_TYPE } from './constant';
+import { HandLandmarkerResult, HandLandmarker } from '@mediapipe/tasks-vision';
+import { FilesetResolver } from '@mediapipe/tasks-vision';
+
+const runningMode = 'VIDEO';
 
 export class MediapipeModel {
   videoRef: React.RefObject<HTMLVideoElement>;
-  worker: Worker;
   lastVideoTimeRef = 0;
   isInitialized = false;
+  handLandmarker: HandLandmarker | null = null;
+  setResult: ((results: HandLandmarkerResult) => void) | null = null;
 
-  constructor(
-    videoRef: React.RefObject<HTMLVideoElement>,
-  ) {
+  constructor(videoRef: React.RefObject<HTMLVideoElement>) {
     this.videoRef = videoRef;
-    this.worker = new Worker(new URL('./workerMediapipe.ts', import.meta.url), {
-      type: 'module',
-    });
-    this.worker.onmessage = (event) => {
-      if (event.data.type === MESSAGE_TYPE.STATUS) {
-        if (event.data.results === 'ready') {
-        }
-        else {
-          throw new Error(event.data.results);
-        }
-      }
-    };
   }
 
-  onMessage = (updateResults: (results: HandLandmarkerResult) => void) =>{
-    this.worker.onmessage = async (
-      event: MessageEvent<{
-        type: string;
-        results: HandLandmarkerResult;
-        status: string;
-      }>
-    ) => {
-      updateResults(event.data.results);
-    };
-  }
-
-  initUserMedia = async (callback?: () => void) => {
+  initUserMedia = async (
+    setResult: (results: HandLandmarkerResult) => void,
+    callback?: () => void
+  ) => {
     try {
       if (this.isInitialized) {
         return;
       }
+      this.setResult = setResult;
+      const vision = await FilesetResolver.forVisionTasks(
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm'
+      );
+      this.handLandmarker = await HandLandmarker.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
+          delegate: 'GPU',
+        },
+        runningMode: runningMode,
+        numHands: 2,
+      });
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'user',
@@ -64,48 +56,23 @@ export class MediapipeModel {
   };
 
   detectForVideo = async () => {
-    if (!this.videoRef.current || !this.worker) {
+    if (!this.videoRef.current || !this.handLandmarker) {
       return;
     }
 
-    const offscreenCanvas = document.createElement('canvas');
-    const ctx = offscreenCanvas.getContext('2d');
-    const width = this.videoRef.current.videoWidth;
-    const height = this.videoRef.current.videoHeight;
-    offscreenCanvas.width = width;
-    offscreenCanvas.height = height;
     const startTimeMs = performance.now();
 
-    if (this.lastVideoTimeRef !== this.videoRef.current.currentTime && ctx) {
+    if (this.lastVideoTimeRef !== this.videoRef.current.currentTime) {
       this.lastVideoTimeRef = this.videoRef.current.currentTime;
-      ctx.drawImage(
+
+      const results = this.handLandmarker?.detectForVideo(
         this.videoRef.current,
-        0,
-        0,
-        width,
-        height
+        startTimeMs
       );
-      const imageData = ctx.getImageData(
-        0,
-        0,
-        width,
-        height
-      );
-      this.worker.postMessage(
-        {
-          type: MESSAGE_TYPE.DETECT,
-          imageData: imageData.data.buffer,
-          width,
-          height,
-          timestamp: startTimeMs,
-        },
-        [imageData.data.buffer]
-      );
+      if (results) {
+        this.setResult?.(results);
+      }
     }
     window.requestAnimationFrame(this.detectForVideo);
-  };
-
-  destroy = () => {
-    this.worker.terminate();
   };
 }

@@ -43,8 +43,7 @@ export default function Home() {
 
   const initMediapipe = useCallback(() => {
     mediapipeRef.current
-      ?.initUserMedia(() => {
-        mediapipeRef.current?.onMessage(setLandmarks);
+      ?.initUserMedia(setLandmarks, () => {
         helperRef.current?.resizeCanvas(window.innerWidth, window.innerHeight);
       })
       .catch((error) => {
