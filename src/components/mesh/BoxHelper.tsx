@@ -24,7 +24,7 @@ export function BoxHelper(props: BoxProps) {
       const position = caculePosition(landMark, camera);
       setPosition(position);
     }
-  }, [landMark]);
+  }, [landMark, camera]);
 
   return (
     <mesh {...props} position={position}>

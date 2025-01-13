@@ -25,7 +25,7 @@ export function ConeHelper(props: ConeProps) {
       const position = caculePosition(landMark, camera);
       setPosition(position);
     }
-  }, [landMark]);
+  }, [landMark, camera]);
 
   return (
     <mesh {...props} position={position}>

@@ -29,7 +29,7 @@ export const Common = ({
       const helper = new THREE.CameraHelper(camera);
       scene.add(helper);
     }
-  }, [camera, scene, DEBUG]);
+  }, [camera, scene]);
 
   return (
     <Suspense fallback={null}>
