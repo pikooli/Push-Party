@@ -2,16 +2,19 @@
 
 import { Suspense, useRef, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { Physics, RigidBody } from '@react-three/rapier';
 // import { useControls } from 'leva';
 import * as THREE from 'three';
-import { View } from '@react-three/drei';
+import { View, Plane } from '@react-three/drei';
 import { HandLandmarkerResult } from '@mediapipe/tasks-vision';
 import { MediapipeModel } from '@/components/videoMediapipe/model/mediapipe';
 import { VideoMediapipe } from '@/components/videoMediapipe/VideoMediapipe';
 import { HelperModel } from '@/components/videoMediapipe/helper/model/helperModel';
 import { HelperComponent } from '@/components/videoMediapipe/helper/HelperComponent';
 import { BoxHelper } from '@/components/mesh/BoxHelper';
+import { Box } from '@/components/mesh/Box';
 import { DEBUG } from '@/constants';
+import { BoundingBox } from '@/components/mesh/BoundingBox';
 
 const Common = dynamic(
   () => import('@/components/canvas/Common').then((mod) => mod.Common),
@@ -69,16 +72,30 @@ export default function Home() {
       </button>
       <View className="absolute left-0 top-0 h-screen w-screen">
         <Suspense fallback={null}>
-          <Common videoRef={videoRef} />
-          <BoxHelper
-            landMark={
-              new THREE.Vector3(
-                landmarks?.landmarks?.[0]?.[0]?.x || 0,
-                landmarks?.landmarks?.[0]?.[0]?.y || 0,
-                landmarks?.landmarks?.[0]?.[0]?.z || 0
-              )
-            }
-          />
+          <Physics debug>
+            <Common videoRef={videoRef} />
+            <RigidBody>
+              <Box position={new THREE.Vector3(0, 0, -4)} castShadow />
+            </RigidBody>
+            <BoundingBox landmarks={landmarks} />
+            {/* <BoxHelper
+              castShadow
+              landMark={
+                new THREE.Vector3(
+                  landmarks?.landmarks?.[0]?.[0]?.x || 0,
+                  landmarks?.landmarks?.[0]?.[0]?.y || 0,
+                  landmarks?.landmarks?.[0]?.[0]?.z || 0
+                )
+              }
+            /> */}
+            <RigidBody type="fixed" position={[0, -4, -4]}>
+              <Plane
+                args={[10, 10]}
+                receiveShadow
+                rotation={[-Math.PI / 2, 0, 0]}
+              />
+            </RigidBody>
+          </Physics>
         </Suspense>
       </View>
     </div>
