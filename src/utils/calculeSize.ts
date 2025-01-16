@@ -1,8 +1,6 @@
 import { NormalizedLandmark } from '@mediapipe/tasks-vision';
 import * as THREE from 'three';
 
-const zPosition = 0;
-
 export const calculeBoundingBox = (
   landmarks: NormalizedLandmark[] | null,
   camera: THREE.Camera
@@ -25,15 +23,24 @@ export const calculeBoundingBox = (
   const centerClipX = (minClipX + maxClipX) / 2;
   const centerClipY = (minClipY + maxClipY) / 2;
 
-  const center = new THREE.Vector3(centerClipX, centerClipY, 0);
+  const center = new THREE.Vector3(centerClipX, centerClipY, 0.9855).unproject(
+    camera
+  );
 
-  const corners = [
-    new THREE.Vector3(minClipX, minClipY, zPosition).unproject(camera),
-    new THREE.Vector3(maxClipX, minClipY, zPosition).unproject(camera),
-    new THREE.Vector3(maxClipX, maxClipY, zPosition).unproject(camera),
-    new THREE.Vector3(minClipX, maxClipY, zPosition).unproject(camera),
-    new THREE.Vector3(minClipX, minClipY, zPosition).unproject(camera), // Close the box
-  ];
+  const positionMinY = new THREE.Vector3(minClipX, minClipY, 0.9855).unproject(
+    camera
+  );
+  const positionMaxY = new THREE.Vector3(minClipX, maxClipY, 0.9855).unproject(
+    camera
+  );
+  const positionMinX = new THREE.Vector3(minClipX, minClipY, 0.9855).unproject(
+    camera
+  );
+  const positionMaxX = new THREE.Vector3(maxClipX, minClipY, 0.9855).unproject(
+    camera
+  );
+  const sizeY = positionMaxY.y - positionMinY.y;
+  const sizeX = positionMaxX.x - positionMinX.x;
 
-  return { corners, center };
+  return { center, sizeY, sizeX };
 };

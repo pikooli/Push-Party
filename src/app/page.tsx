@@ -41,6 +41,7 @@ export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const helperRef = useRef<HelperModel>(null);
   const [landmarks, setLandmarks] = useState<HandLandmarkerResult | null>(null);
+  const [boxes, setBoxes] = useState<THREE.Vector3[]>([]);
 
   // const { position } = useHelper();
 
@@ -54,6 +55,10 @@ export default function Home() {
       });
   }, []);
 
+  const addBox = useCallback(() => {
+    setBoxes((prev) => [...prev, new THREE.Vector3(0, 0, -4)]);
+  }, []);
+
   return (
     <div className="h-screen">
       <div className="absolute left-0 top-0 hidden">
@@ -64,31 +69,32 @@ export default function Home() {
         landmarks={landmarks}
         showHelper={DEBUG}
       />
-      <button
-        className="absolute left-1/2 top-0 z-50 bg-blue-500 p-4"
-        onClick={initMediapipe}
-      >
-        Init Mediapipe
-      </button>
+      <div className="absolute left-1/2 top-0 z-50 flex gap-2">
+        <button className="bg-blue-500 p-4" onClick={initMediapipe}>
+          Init Mediapipe
+        </button>
+        <button className="bg-green-500 p-4" onClick={addBox}>
+          Add Box
+        </button>
+      </div>
       <View className="absolute left-0 top-0 h-screen w-screen">
         <Suspense fallback={null}>
           <Physics debug>
             <Common videoRef={videoRef} />
-            <RigidBody>
-              <Box position={new THREE.Vector3(0, 0, -4)} castShadow />
-            </RigidBody>
-            <BoundingBox landmarks={landmarks} />
-            {/* <BoxHelper
-              castShadow
-              landMark={
-                new THREE.Vector3(
-                  landmarks?.landmarks?.[0]?.[0]?.x || 0,
-                  landmarks?.landmarks?.[0]?.[0]?.y || 0,
-                  landmarks?.landmarks?.[0]?.[0]?.z || 0
-                )
-              }
-            /> */}
-            <RigidBody type="fixed" position={[0, -4, -4]}>
+            {boxes.map((position, index) => (
+              <RigidBody
+                key={index}
+                onCollisionEnter={(event) => {
+                  console.log('collision', event);
+                }}
+              >
+                <Box position={position} castShadow />
+              </RigidBody>
+            ))}
+            {landmarks?.landmarks?.map((landmark, index) => (
+              <BoundingBox landmarks={landmark} key={index} />
+            ))}
+            <RigidBody type="fixed" position={[0, -4, -4]} name="floor">
               <Plane
                 args={[10, 10]}
                 receiveShadow

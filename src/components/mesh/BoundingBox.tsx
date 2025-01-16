@@ -1,24 +1,38 @@
 'use client';
 
-import { HandLandmarkerResult } from '@mediapipe/tasks-vision';
+import { useEffect, useRef } from 'react';
+import { NormalizedLandmark } from '@mediapipe/tasks-vision';
 import { calculeBoundingBox } from '@/utils';
 import { Line, Box } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
-import { RigidBody } from '@react-three/rapier';
+import { RigidBody, RigidBodyApi } from '@react-three/rapier';
 
 export const BoundingBox = ({
   landmarks,
 }: {
-  landmarks: HandLandmarkerResult | null;
+  landmarks: NormalizedLandmark[] | null;
 }) => {
+  const rigidBodyRef = useRef<RigidBodyApi>(null);
   const { camera } = useThree();
   if (!landmarks) return null;
-  const { corners, center } = calculeBoundingBox(
-    landmarks.landmarks?.[0],
-    camera
-  );
-  console.log(corners);
-  if (!corners) return null;
+  const { sizeY, sizeX, center } = calculeBoundingBox(landmarks, camera);
 
-  return <Line points={corners} color="blue" lineWidth={2} />;
+  if (!center) return null;
+
+  return (
+    <RigidBody
+      ref={rigidBodyRef}
+      name="bounding-box"
+      type="dynamic"
+      colliders="cuboid"
+      position={center}
+      ccd={true} // Enable continuous collision detection
+      key={`${sizeY}-${center.toArray().join(',')}`}
+      mass={100}
+    >
+      <Box args={[sizeX, sizeY, -10]}>
+        <meshBasicMaterial opacity={0} transparent={true} color="blue" />
+      </Box>
+    </RigidBody>
+  );
 };
