@@ -1,6 +1,7 @@
 'use client';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
+import { BOX_SIZE } from '@/constants';
 
 const displayPosition = (position: THREE.Vector3) => {
   if (!position) return '';
@@ -19,7 +20,7 @@ export function Box(props: JSX.IntrinsicElements['mesh']) {
         {/* @ts-expect-error props.position is not null */}
         {displayPosition(props.position)}
       </Text>
-      <boxGeometry />
+      <boxGeometry args={[BOX_SIZE.x, BOX_SIZE.y, BOX_SIZE.z]} />
       <meshStandardMaterial color="red" emissive="red" />
     </mesh>
   );

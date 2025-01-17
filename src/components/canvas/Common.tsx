@@ -25,7 +25,7 @@ export const Common = ({
   }, [scene, videoRef]);
 
   useEffect(() => {
-    if (DEBUG) {
+    if (DEBUG.showCameraHelper) {
       const helper = new THREE.CameraHelper(camera);
       scene.add(helper);
     }
@@ -33,12 +33,18 @@ export const Common = ({
 
   return (
     <Suspense fallback={null}>
-      {DEBUG && <Perf position="top-left" />}
-      <ambientLight />
-      {DEBUG && <axesHelper args={[10]} />}
-      {DEBUG && <OrbitControls />}
-      <pointLight position={[20, 30, 10]} intensity={3} decay={0.2} />
-      <pointLight position={[-10, -10, -10]} color="blue" decay={0.2} />
+      {DEBUG.showPerformance && <Perf position="top-left" />}
+      {DEBUG.showAxesHelper && <axesHelper args={[10]} />}
+      {DEBUG.showOrbitControls && <OrbitControls />}
+      <pointLight
+        position={[-2, 0, 0]}
+        intensity={10}
+        decay={0.2}
+        color="white"
+        castShadow={true}
+        shadow-mapSize={[1024, 1024]} // Shadow resolution
+        shadow-bias={-0.001} // Helps prevent shadow acne
+      />
       <PerspectiveCamera
         makeDefault
         fov={CAMERA_FOV}

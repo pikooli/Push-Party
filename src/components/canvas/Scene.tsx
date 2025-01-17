@@ -10,6 +10,7 @@ export default function Scene({ ...props }) {
   return (
     <Canvas
       {...props}
+      shadows={true}
       onCreated={(state) => (state.gl.toneMapping = THREE.AgXToneMapping)}
     >
       <View.Port />
