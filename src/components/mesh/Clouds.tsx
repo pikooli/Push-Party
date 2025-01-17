@@ -8,8 +8,8 @@ import { Group } from 'three';
 const SPEED = 2;
 const LIMIT_CLOUD = {
   1: 0,
-  2: 3,
-  3: 8,
+  2: 1,
+  3: 4,
 };
 
 export const Clouds = () => {
@@ -18,22 +18,23 @@ export const Clouds = () => {
   const cloudRef2 = useRef<Group>(null);
   const cloudRef3 = useRef<Group>(null);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
+    const move = delta * SPEED;
     if (cloudRef1.current) {
-      cloudRef1.current.position.x += delta * SPEED;
-      if (cloudRef1.current.position.x > MAX_CLOUD_POSITION) {
+      cloudRef1.current.position.x += move;
+      if (cloudRef1.current.position.x > MAX_CLOUD_POSITION + LIMIT_CLOUD[1]) {
         cloudRef1.current.position.x = -MAX_CLOUD_POSITION + LIMIT_CLOUD[1];
       }
     }
     if (cloudRef2.current) {
-      cloudRef2.current.position.x += delta * SPEED;
-      if (cloudRef2.current.position.x > MAX_CLOUD_POSITION) {
+      cloudRef2.current.position.x += move;
+      if (cloudRef2.current.position.x > MAX_CLOUD_POSITION + LIMIT_CLOUD[2]) {
         cloudRef2.current.position.x = -MAX_CLOUD_POSITION + LIMIT_CLOUD[2];
       }
     }
     if (cloudRef3.current) {
-      cloudRef3.current.position.x += delta * SPEED;
-      if (cloudRef3.current.position.x > MAX_CLOUD_POSITION) {
+      cloudRef3.current.position.x += move;
+      if (cloudRef3.current.position.x > MAX_CLOUD_POSITION + LIMIT_CLOUD[3]) {
         cloudRef3.current.position.x = -MAX_CLOUD_POSITION + LIMIT_CLOUD[3];
       }
     }

@@ -5,6 +5,8 @@ import { View } from '@react-three/drei';
 import { Clouds } from '@/components/mesh/Clouds';
 import { Sphere } from '@/components/mesh/Sphere';
 import * as THREE from 'three';
+import { Loading } from '@/components/Loading';
+import { useLoadingStore } from '@/zustand/store';
 
 interface DescriptionProps {
   initMediapipe: () => void;
@@ -20,9 +22,8 @@ const Information = () => {
         🎯 Get ready for a fun interactive experience where you can push and
         play with 3D objects using just your hands! ✨
       </p>
-      <p className="text-lg leading-relaxed text-gray-700">
-        {' '}
-        📸 Make sure your camera is enabled and your hands are visible. 👋
+      <p className="mt-2 rounded-lg bg-yellow-200 p-2 text-sm text-gray-700">
+        📸 Make sure your camera is enabled.
       </p>
       <p className="mt-2 rounded-lg bg-red-500 p-2 text-sm text-gray-200">
         ⚠️ Note: This application requires either a decent dedicated GPU or
@@ -35,6 +36,7 @@ const Information = () => {
 export const Description = ({ initMediapipe }: DescriptionProps) => {
   const [worldTexture, setWorldTexture] = useState<THREE.Texture>();
   const [cloudTexture, setCloudTexture] = useState<THREE.Texture>();
+  const { isLoading } = useLoadingStore();
 
   useEffect(() => {
     const loader = new THREE.TextureLoader();
@@ -90,15 +92,20 @@ export const Description = ({ initMediapipe }: DescriptionProps) => {
           )}
         </group>
       </View>
+
       <div className="absolute bottom-0 left-0 right-0 z-50 flex h-screen items-center justify-center">
         <div className="flex max-w-lg flex-col items-center gap-8 rounded-xl bg-white/90 p-8 text-center shadow-lg">
           <Information />
-          <button
-            className="rounded-lg bg-blue-500 px-8 py-4 font-medium text-white transition hover:bg-blue-600"
-            onClick={initMediapipe}
-          >
-            Start Playing
-          </button>
+          {isLoading ? (
+            <Loading />
+          ) : (
+            <button
+              className="rounded-lg bg-blue-500 px-8 py-4 font-medium text-white transition hover:bg-blue-600"
+              onClick={initMediapipe}
+            >
+              Start Playing
+            </button>
+          )}
         </div>
       </div>
     </div>

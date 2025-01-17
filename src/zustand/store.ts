@@ -121,3 +121,37 @@ export const useTextureStore = create<TextureStore>((set) => ({
   texture: null,
   setTexture: (texture: THREE.Texture) => set({ texture }),
 }));
+
+interface LoadingStore {
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
+}
+
+export const useLoadingStore = create<LoadingStore>((set) => ({
+  isLoading: false,
+  setIsLoading: (isLoading: boolean) => set({ isLoading }),
+}));
+
+interface MusicStore {
+  music: HTMLAudioElement | null;
+  setMusic: (music: HTMLAudioElement) => void;
+}
+
+export const useMusicStore = create<MusicStore>((set, get) => ({
+  music: null,
+  setMusic: (music: HTMLAudioElement) => {
+    if (music) {
+      music.loop = true;
+      music.volume = 0.2;
+      music.play();
+    }
+    set({ music });
+  },
+  stopMusic: () => {
+    const music = get().music;
+    if (music) {
+      music.pause();
+      music.currentTime = 0;
+    }
+  },
+}));

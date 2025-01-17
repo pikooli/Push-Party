@@ -14,6 +14,19 @@ interface JumpingBoxProps extends RigidBodyProps {
   onMount?: (rb: RapierRigidBody) => void;
 }
 
+const playSound = (strength: number = 0.5) => {
+  try {
+    const audio = new Audio('/sound/wood.mp3');
+    audio.volume = strength;
+    audio.play();
+    audio.addEventListener('ended', () => {
+      audio.src = ''; // Clear the source
+    });
+  } catch (error) {
+    console.error('Error playing sound:', error);
+  }
+};
+
 export const JumpingBox = ({ onMount, ...props }: JumpingBoxProps) => {
   const rigidBodyRef = useRef<RapierRigidBody>(null);
   const { texture } = useTextureStore();
@@ -43,12 +56,21 @@ export const JumpingBox = ({ onMount, ...props }: JumpingBoxProps) => {
         z: colliderPosition.z - targetPosition.z,
       };
 
+      const distance = Math.sqrt(
+        direction.x * direction.x +
+          direction.y * direction.y +
+          direction.z * direction.z
+      );
+
       const impulseMagnitude = 50;
       const impulse = {
         x: direction.x * impulseMagnitude,
         y: direction.y * impulseMagnitude,
         z: direction.z * impulseMagnitude,
       };
+
+      const strength = Math.min(distance / 5, 1);
+      playSound(strength);
       rigidBodyRef.current?.applyImpulse(impulse, true);
     }
   }, []);
