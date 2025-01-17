@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef } from 'react';
-import { Box, useTexture } from '@react-three/drei';
+import { Box } from '@react-three/drei';
 import {
   RigidBody,
   CollisionEnterPayload,

@@ -22,9 +22,12 @@ export const Sphere = (props: {
   } = props;
   const ref = useRef<THREE.Mesh>(null);
 
-  useFrame((state, delta) =>
-    ref.current ? (ref.current.rotation.y += rotationY || 0) : null
-  );
+  useFrame(() => {
+    if (ref.current) {
+      ref.current.rotation.y += rotationY || 0;
+    }
+  });
+
   return (
     <mesh ref={ref} scale={scale}>
       <sphereGeometry args={[radius, widthSegments, heightSegments]} />

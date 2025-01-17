@@ -8,13 +8,14 @@ export const Buttons = () => {
   const { setTexture } = useTextureStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [duckTexture, setDuckTexture] = useState<THREE.Texture | null>(null);
+
   useEffect(() => {
     const loader = new THREE.TextureLoader();
     loader.load('/duck.png', (loadedTexture) => {
       setDuckTexture(loadedTexture);
       setTexture(loadedTexture);
     });
-  }, []);
+  }, [setTexture]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

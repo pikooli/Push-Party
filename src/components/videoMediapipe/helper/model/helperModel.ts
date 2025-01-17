@@ -93,7 +93,10 @@ export class HelperModel {
     this.canvasCtx.restore();
   }
 
-  drawLandmarkCoordonate(landmarks: NormalizedLandmark[], worldLandmarks: NormalizedLandmark[]) {
+  drawLandmarkCoordonate(
+    landmarks: NormalizedLandmark[],
+    worldLandmarks: NormalizedLandmark[]
+  ) {
     if (!this.canvasCtx) return;
     this.canvasCtx.save();
     this.canvasCtx.scale(-1, 1);
@@ -103,15 +106,15 @@ export class HelperModel {
 
     landmarks.forEach((landmark, index) => {
       // if ([4, 8, 12, 16, 20].includes(index)) {
-        const x = this.canvasWidth - landmark.x * this.canvasWidth;
-        const y = landmark.y * this.canvasHeight;
-        
-        this.canvasCtx!.fillStyle = "white";
-        this.canvasCtx!.fillRect(x + 4, y + 4, 100, 30);
-        this.canvasCtx!.fillStyle = "black";
-        this.canvasCtx!.fillText(`x=${worldLandmarks[index].x}`, x + 5, y + 5);
-        this.canvasCtx!.fillText(`y=${worldLandmarks[index].y}`, x + 5, y + 15);
-        this.canvasCtx!.fillText(`z=${worldLandmarks[index].z}`, x + 5, y + 25);
+      const x = this.canvasWidth - landmark.x * this.canvasWidth;
+      const y = landmark.y * this.canvasHeight;
+
+      this.canvasCtx!.fillStyle = 'white';
+      this.canvasCtx!.fillRect(x + 4, y + 4, 100, 30);
+      this.canvasCtx!.fillStyle = 'black';
+      this.canvasCtx!.fillText(`x=${worldLandmarks[index].x}`, x + 5, y + 5);
+      this.canvasCtx!.fillText(`y=${worldLandmarks[index].y}`, x + 5, y + 15);
+      this.canvasCtx!.fillText(`z=${worldLandmarks[index].z}`, x + 5, y + 25);
       // }
     });
 
@@ -133,9 +136,9 @@ export class HelperModel {
         const x =
           this.canvasWidth - landmarks[hand.index][0].x * this.canvasWidth;
         const y = landmarks[hand.index][0].y * this.canvasHeight;
-        
+
         if (!hand.displayName) return;
-        const name = hand.displayName === "Left" ? "Right" : "Left";
+        const name = hand.displayName === 'Left' ? 'Right' : 'Left';
         this.canvasCtx!.fillText(name, x + 5, y + 5);
       });
     });

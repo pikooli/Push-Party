@@ -47,7 +47,7 @@ export const JumpingBoxs = () => {
       }
     });
     setRemoveBoxesIds([]);
-  }, [removeBoxesIds]);
+  }, [removeBoxesIds, world, removeBox]);
 
   return (
     <group name={NAME}>

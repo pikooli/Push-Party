@@ -1,8 +1,10 @@
+'use client';
+
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Cloud } from './Cloud';
+import { Group } from 'three';
 
-const MAX_CLOUD_POSITION = window.innerWidth / 100; // Convert pixels to Three.js units
 const SPEED = 2;
 const LIMIT_CLOUD = {
   1: 0,
@@ -11,9 +13,10 @@ const LIMIT_CLOUD = {
 };
 
 export const Clouds = () => {
-  const cloudRef1 = useRef<any>();
-  const cloudRef2 = useRef<any>();
-  const cloudRef3 = useRef<any>();
+  const MAX_CLOUD_POSITION = window.innerWidth / 100; // Convert pixels to Three.js units
+  const cloudRef1 = useRef<Group>(null);
+  const cloudRef2 = useRef<Group>(null);
+  const cloudRef3 = useRef<Group>(null);
 
   useFrame((state, delta) => {
     if (cloudRef1.current) {
