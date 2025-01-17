@@ -113,7 +113,7 @@ export const towerCoordinates: THREE.Vector3[] = generateTowerCoordinates(
 );
 
 export const wallCoordinates: THREE.Vector3[] = generateWallCoordinates(
-  8,
+  6,
   6,
   boxSize
 );

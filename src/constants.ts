@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 
 export const DEBUG = {
-  showPerformance: true,
+  showPerformance: false,
   showLandmarks: false,
-  showOrbitControls: true,
+  showOrbitControls: false,
   showAxesHelper: false,
   showCameraHelper: false,
 };

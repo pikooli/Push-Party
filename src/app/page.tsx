@@ -1,35 +1,27 @@
 'use client';
 
-import { Suspense, useRef, useCallback, useState } from 'react';
-import dynamic from 'next/dynamic';
-import { Physics } from '@react-three/rapier';
-import { View } from '@react-three/drei';
+import { useRef, useCallback, useState } from 'react';
 import { HandLandmarkerResult } from '@mediapipe/tasks-vision';
 import { MediapipeModel } from '@/components/videoMediapipe/model/mediapipe';
 import { VideoMediapipe } from '@/components/videoMediapipe/VideoMediapipe';
 import { HelperModel } from '@/components/videoMediapipe/helper/model/helperModel';
 import { HelperComponent } from '@/components/videoMediapipe/helper/HelperComponent';
-import { DEBUG, FLOOR_POSITION } from '@/constants';
-import { BoundingBox } from '@/components/mesh/BoundingBox';
-import { Floor } from '@/components/mesh/Floor';
-import { JumpingBoxs } from '@/components/mesh/JumpingBoxs';
-import { Buttons } from '@/components/Buttons';
-
-const Common = dynamic(
-  () => import('@/components/canvas/Common').then((mod) => mod.Common),
-  { ssr: false }
-);
+import { DEBUG } from '@/constants';
+import { Game } from '@/components/canvas/Game';
+import { Description } from '@/components/Description';
 
 export default function Home() {
   const mediapipeRef = useRef<MediapipeModel>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const helperRef = useRef<HelperModel>(null);
   const [landmarks, setLandmarks] = useState<HandLandmarkerResult | null>(null);
+  const [isInit, setIsInit] = useState(false);
 
   const initMediapipe = useCallback(() => {
     mediapipeRef.current
       ?.initUserMedia(setLandmarks, () => {
         helperRef.current?.resizeCanvas(window.innerWidth, window.innerHeight);
+        setIsInit(true);
       })
       .catch((error) => {
         console.error('Error initializing Mediapipe:', error);
@@ -46,19 +38,8 @@ export default function Home() {
         landmarks={landmarks}
         showHelper={DEBUG.showLandmarks}
       />
-      <Buttons initMediapipe={initMediapipe} />
-      <View className="absolute left-0 top-0 h-screen w-screen">
-        <Suspense fallback={null}>
-          <Physics>
-            <Common videoRef={videoRef} />
-            <JumpingBoxs />
-            {landmarks?.landmarks?.map((landmark, index) => (
-              <BoundingBox landmarks={landmark} key={index} />
-            ))}
-            <Floor position={FLOOR_POSITION} />
-          </Physics>
-        </Suspense>
-      </View>
+      {!isInit && <Description initMediapipe={initMediapipe} />}
+      {isInit && <Game videoRef={videoRef} landmarks={landmarks} />}
     </div>
   );
 }

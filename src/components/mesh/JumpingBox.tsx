@@ -9,15 +9,14 @@ import {
   RigidBodyProps,
 } from '@react-three/rapier';
 import { BOX_SIZE } from '@/constants';
-
+import { useTextureStore } from '@/zustand/store';
 interface JumpingBoxProps extends RigidBodyProps {
   onMount?: (rb: RapierRigidBody) => void;
 }
 
 export const JumpingBox = ({ onMount, ...props }: JumpingBoxProps) => {
   const rigidBodyRef = useRef<RapierRigidBody>(null);
-  const cooldownRef = useRef(false);
-  const texture = useTexture('/duck.png');
+  const { texture } = useTextureStore();
 
   useEffect(() => {
     if (rigidBodyRef.current && onMount) {
@@ -26,11 +25,6 @@ export const JumpingBox = ({ onMount, ...props }: JumpingBoxProps) => {
   }, [onMount]);
 
   const handleCollisionEnter = useCallback((event: CollisionEnterPayload) => {
-    // if (cooldownRef.current) return;
-    // cooldownRef.current = true;
-
-    // setTimeout(() => (cooldownRef.current = false), 200);
-
     if (event.rigidBodyObject?.name === 'bounding-box') {
       const targetPosition = event.target?.rigidBodyObject?.position || {
         x: 0,

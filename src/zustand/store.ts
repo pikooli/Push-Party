@@ -111,3 +111,13 @@ export const useBoxStore = create<BoxStore>((set, get) => ({
     return get().boxes.find((box) => box.name === name)?.rigidBody;
   },
 }));
+
+interface TextureStore {
+  texture: THREE.Texture | null;
+  setTexture: (texture: THREE.Texture) => void;
+}
+
+export const useTextureStore = create<TextureStore>((set) => ({
+  texture: null,
+  setTexture: (texture: THREE.Texture) => set({ texture }),
+}));

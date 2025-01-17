@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { JumpingBox } from './JumpingBox';
 import { useFrame, useThree } from '@react-three/fiber';
-import { FLOOR_POSITION, JUMPING_BOX_NAME } from '@/constants';
-import * as THREE from 'three';
+import { FLOOR_POSITION } from '@/constants';
 import { RapierRigidBody, useRapier } from '@react-three/rapier';
 import { useBoxStore } from '@/zustand/store';
 
@@ -27,7 +26,6 @@ export const JumpingBoxs = () => {
         const remove = tmp.children.filter((child) => {
           return FLOOR_POSITION.distanceTo(child.position) > MAX_DISTANCE;
         });
-        console.log('remove length', remove.length);
         remove.forEach((child) => {
           setRemoveBoxesIds((prev) => [...prev, child.name]);
         });
