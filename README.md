@@ -1,6 +1,7 @@
 # Push Party
 
 A fun interactive web game that uses hand tracking to let you push and interact with 3D objects in a virtual space.
+Test it here : [https://push-party.vercel.app/](https://push-party.vercel.app/)
 
 ## Features
 
