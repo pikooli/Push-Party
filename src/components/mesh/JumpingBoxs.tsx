@@ -4,9 +4,16 @@ import {
   InstancedRigidBodies,
   CollisionEnterPayload,
   InstancedRigidBodyProps,
+  RapierRigidBody,
 } from '@react-three/rapier';
 import { useTextureStore } from '@/zustand/store';
 import { BOX_SIZE } from '@/constants';
+
+interface RapierRigidBodyWithUserData extends RapierRigidBody {
+  userData: {
+    name: string;
+  };
+}
 
 const playSound = (strength: number = 0.5) => {
   try {
@@ -14,7 +21,7 @@ const playSound = (strength: number = 0.5) => {
     audio.volume = strength;
     audio.play();
     audio.addEventListener('ended', () => {
-      audio.src = ''; // Clear the source
+      audio.src = '';
     });
     return audio;
   } catch (error) {
@@ -24,7 +31,7 @@ const playSound = (strength: number = 0.5) => {
 
 export const JumpingBoxs = ({ boxes }: { boxes: BoxEntity[] }) => {
   const { texture } = useTextureStore();
-  const cubes = useRef<InstancedRigidBodies>(null);
+  const cubes = useRef<RapierRigidBodyWithUserData[]>([]);
 
   const instances = useMemo(() => {
     const instances: InstancedRigidBodyProps[] = [];
@@ -45,8 +52,6 @@ export const JumpingBoxs = ({ boxes }: { boxes: BoxEntity[] }) => {
   }, [boxes]);
 
   const handleCollisionEnter = useCallback((event: CollisionEnterPayload) => {
-    // console.log(event);
-    // console.log(cubes.current);
     if (event.rigidBodyObject?.name === 'bounding-box') {
       const targetPosition = event.target?.rigidBodyObject?.position || {
         x: 0,
@@ -80,17 +85,15 @@ export const JumpingBoxs = ({ boxes }: { boxes: BoxEntity[] }) => {
 
       const strength = Math.min(distance / 5, 1);
       playSound(strength);
-      console.log('event', event);
-      console.log('cubes.current', cubes.current);
-      const colliderHandleName = event.target?.rigidBody?.userData.name;
-      // Find the instance associated with the handle
-      if (colliderHandleName) {
+      const colliderHandleName = (
+        event.target?.rigidBody?.userData as {
+          name: string;
+        }
+      ).name;
+      if (colliderHandleName && cubes.current) {
         const colliderInstance = cubes.current.find(
           (instance) => instance.userData.name === colliderHandleName
         );
-        console.log('Collider Instance:', colliderInstance);
-
-        // Apply impulse or perform other actions on this instance
         if (colliderInstance) {
           colliderInstance.applyImpulse(impulse, true);
         }
