@@ -28,7 +28,7 @@ export const Game = ({ videoRef, landmarks }: GameProps) => {
       <Buttons />
       <View className="absolute left-0 top-0 h-screen w-screen">
         <Suspense fallback={null}>
-          <Physics debug>
+          <Physics debug={false}>
             <Common videoRef={videoRef} />
             <JumpingBoxs boxes={boxes} />
             {landmarks?.landmarks?.map((landmark, index) => (

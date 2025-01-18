@@ -127,7 +127,7 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
     if (music) {
       music.loop = true;
       music.volume = 0.2;
-      // music.play();
+      music.play();
     }
     set({ music });
   },

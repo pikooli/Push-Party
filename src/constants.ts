@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 export const DEBUG = {
-  showPerformance: true,
+  showPerformance: false,
   showLandmarks: false,
   showOrbitControls: false,
   showAxesHelper: false,
