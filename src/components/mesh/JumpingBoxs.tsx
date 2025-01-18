@@ -1,68 +1,118 @@
-import { useState, useRef, useEffect } from 'react';
-import { JumpingBox } from './JumpingBox';
-import { useFrame, useThree } from '@react-three/fiber';
-import { FLOOR_POSITION } from '@/constants';
-import { RapierRigidBody, useRapier } from '@react-three/rapier';
-import { useBoxStore } from '@/zustand/store';
+import { useMemo, useCallback, useRef } from 'react';
+import { BoxEntity } from '@/zustand/store';
+import {
+  InstancedRigidBodies,
+  CollisionEnterPayload,
+  InstancedRigidBodyProps,
+} from '@react-three/rapier';
+import { useTextureStore } from '@/zustand/store';
+import { BOX_SIZE } from '@/constants';
 
-const MAX_DISTANCE = 50;
-const NAME = 'jumping-boxs';
-
-export const JumpingBoxs = () => {
-  const rigidBodiesRef = useRef<Map<string, RapierRigidBody>>(new Map());
-  const { scene } = useThree();
-  const { world } = useRapier();
-  const { boxes, removeBox } = useBoxStore();
-  const [removeBoxesIds, setRemoveBoxesIds] = useState<string[]>([]);
-  const lastUpdateRef = useRef(false);
-
-  useFrame(() => {
-    if (lastUpdateRef.current) return;
-    lastUpdateRef.current = true;
-
-    try {
-      const tmp = scene.children.find((child) => child.name === NAME);
-      if (tmp) {
-        const remove = tmp.children.filter((child) => {
-          return FLOOR_POSITION.distanceTo(child.position) > MAX_DISTANCE;
-        });
-        remove.forEach((child) => {
-          setRemoveBoxesIds((prev) => [...prev, child.name]);
-        });
-      }
-    } catch (error) {
-      console.error('Error removing box:', error);
-    }
-    lastUpdateRef.current = false;
-  });
-
-  useEffect(() => {
-    if (removeBoxesIds.length === 0) return;
-    removeBoxesIds.forEach((id) => {
-      const rigidBody = rigidBodiesRef.current.get(id);
-      if (rigidBody) {
-        removeBox(id);
-        world.removeRigidBody(rigidBody);
-        rigidBodiesRef.current.delete(id);
-      }
+const playSound = (strength: number = 0.5) => {
+  try {
+    const audio = new Audio('/sound/wood.mp3');
+    audio.volume = strength;
+    audio.play();
+    audio.addEventListener('ended', () => {
+      audio.src = ''; // Clear the source
     });
-    setRemoveBoxesIds([]);
-  }, [removeBoxesIds, world, removeBox]);
+    return audio;
+  } catch (error) {
+    console.error('Error playing sound:', error);
+  }
+};
+
+export const JumpingBoxs = ({ boxes }: { boxes: BoxEntity[] }) => {
+  const { texture } = useTextureStore();
+  const cubes = useRef<InstancedRigidBodies>(null);
+
+  const instances = useMemo(() => {
+    const instances: InstancedRigidBodyProps[] = [];
+    for (let i = 0; i < boxes.length; i++) {
+      instances.push({
+        key: boxes[i].name,
+        position: [
+          boxes[i].position.x,
+          boxes[i].position.y,
+          boxes[i].position.z,
+        ],
+        rotation: [0, 0, 0],
+        userData: { name: boxes[i].name },
+      });
+    }
+
+    return instances;
+  }, [boxes]);
+
+  const handleCollisionEnter = useCallback((event: CollisionEnterPayload) => {
+    // console.log(event);
+    // console.log(cubes.current);
+    if (event.rigidBodyObject?.name === 'bounding-box') {
+      const targetPosition = event.target?.rigidBodyObject?.position || {
+        x: 0,
+        y: 0,
+        z: 0,
+      };
+      const colliderPosition = event.rigidBodyObject?.position || {
+        x: 0,
+        y: 0,
+        z: 0,
+      };
+
+      const direction = {
+        x: colliderPosition.x - targetPosition.x,
+        y: colliderPosition.y - targetPosition.y,
+        z: colliderPosition.z - targetPosition.z,
+      };
+
+      const distance = Math.sqrt(
+        direction.x * direction.x +
+          direction.y * direction.y +
+          direction.z * direction.z
+      );
+
+      const impulseMagnitude = 50;
+      const impulse = {
+        x: direction.x * impulseMagnitude,
+        y: direction.y * impulseMagnitude,
+        z: direction.z * impulseMagnitude,
+      };
+
+      const strength = Math.min(distance / 5, 1);
+      playSound(strength);
+      console.log('event', event);
+      console.log('cubes.current', cubes.current);
+      const colliderHandleName = event.target?.rigidBody?.userData.name;
+      // Find the instance associated with the handle
+      if (colliderHandleName) {
+        const colliderInstance = cubes.current.find(
+          (instance) => instance.userData.name === colliderHandleName
+        );
+        console.log('Collider Instance:', colliderInstance);
+
+        // Apply impulse or perform other actions on this instance
+        if (colliderInstance) {
+          colliderInstance.applyImpulse(impulse, true);
+        }
+      }
+    }
+  }, []);
 
   return (
-    <group name={NAME}>
-      {boxes.map((box) => {
-        return (
-          <JumpingBox
-            key={box.name}
-            position={box.position}
-            name={box.name}
-            onMount={(rb) => {
-              rigidBodiesRef.current.set(box.name, rb);
-            }}
-          />
-        );
-      })}
-    </group>
+    <InstancedRigidBodies
+      instances={instances}
+      mass={1}
+      onCollisionEnter={handleCollisionEnter}
+      ref={cubes}
+    >
+      <instancedMesh
+        castShadow
+        receiveShadow
+        args={[undefined, undefined, boxes.length]}
+      >
+        <boxGeometry args={[BOX_SIZE.x, BOX_SIZE.y, BOX_SIZE.z]} />
+        <meshStandardMaterial map={texture} />
+      </instancedMesh>
+    </InstancedRigidBodies>
   );
 };

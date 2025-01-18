@@ -9,12 +9,10 @@ import {
 } from '@/utils/coordinates';
 import { v4 as uuidv4 } from 'uuid';
 import { JUMPING_BOX_NAME, GEOMETRY_TYPES } from '@/constants';
-import { RapierRigidBody } from '@react-three/rapier';
 
 export interface BoxEntity {
   position: THREE.Vector3;
   name: string;
-  rigidBody?: RapierRigidBody;
 }
 
 interface BoxStore {
@@ -23,13 +21,11 @@ interface BoxStore {
   removeBox: (name: string) => void;
   removeAllBoxes: () => void;
   setSpecifyGeometry: (geometry: string) => void;
-  setRigidBodies: (name: string, rigidBody: RapierRigidBody) => void;
-  getRigidBody: (name: string) => RapierRigidBody | undefined;
 }
 
 const generateBoxName = () => `${JUMPING_BOX_NAME}-${uuidv4()}`;
 
-export const useBoxStore = create<BoxStore>((set, get) => ({
+export const useBoxStore = create<BoxStore>((set) => ({
   boxes: [],
   addBox: () =>
     set((state) => ({
@@ -98,18 +94,6 @@ export const useBoxStore = create<BoxStore>((set, get) => ({
         break;
     }
   },
-  setRigidBodies: (name: string, rigidBody: RapierRigidBody) => {
-    set((state) => {
-      const box = state.boxes.find((box) => box.name === name);
-      if (box) {
-        box.rigidBody = rigidBody;
-      }
-      return state;
-    });
-  },
-  getRigidBody: (name: string) => {
-    return get().boxes.find((box) => box.name === name)?.rigidBody;
-  },
 }));
 
 interface TextureStore {
@@ -143,7 +127,7 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
     if (music) {
       music.loop = true;
       music.volume = 0.2;
-      music.play();
+      // music.play();
     }
     set({ music });
   },
